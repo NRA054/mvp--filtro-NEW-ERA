@@ -81,6 +81,17 @@
 - Procesar datos de cara en el dispositivo siempre que sea posible.
 - Mantener la experiencia ligera y fácil de probar.
 
+### 5.4 Filtro de color en runtime
+
+- Implementar tintado de gorras en tiempo de ejecución para el probador virtual (AR/3D). Esto permite al usuario probar variantes de color sin regenerar modelos en el servidor.
+- En el cliente (Three.js) se pueden aplicar dos estrategias:
+	- Si el material no tiene textura (`map`), cambiar `material.color` a un `THREE.Color` con el color seleccionado.
+	- Si el material tiene una textura base, crear una textura tintada (Canvas) donde se mezcle la imagen original con el color seleccionado y asignarla a `material.map`.
+- Mantener la PBR (metalness/roughness) y solo alterar el albedo para preservar realismo.
+- Añadir cache local de variantes generadas para acelerar la conmutación de colores.
+
+Ejemplo práctico: hay un ejemplo funcional en `examples/color-filter/` que muestra cómo cargar un `.glb`, seleccionar color y aplicar el filtro en tiempo real.
+
 ## 6. Recomendaciones para el desarrollo
 
 - Definir claramente las categorías de estilo (`deportivo`, `urbano`, `minimalista`, etc.).

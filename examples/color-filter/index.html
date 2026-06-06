@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Color Filter - Example</title>
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; }
+    #canvas { width: 100vw; height: 70vh; display: block; }
+    .controls { padding: 12px; display:flex; gap:8px; align-items:center; }
+  </style>
+</head>
+<body>
+  <div class="controls">
+    <input id="file" type="file" accept=".glb,.gltf" />
+    <label for="color">Color:</label>
+    <input id="color" type="color" value="#ff0000" />
+    <button id="apply">Aplicar color</button>
+    <button id="reset">Reset</button>
+  </div>
+  <div id="canvas"></div>
+
+  <script type="module">
+    import * as THREE from 'https://unpkg.com/three@0.158.0/build/three.module.js';
+    import { GLTFLoader } from 'https://unpkg.com/three@0.158.0/examples/jsm/loaders/GLTFLoader.js';
+    import { OrbitControls } from 'https://unpkg.com/three@0.158.0/examples/jsm/controls/OrbitControls.js';
+
+    const container = document.getElementById('canvas');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xf0f0f0);
+
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / (window.innerHeight * 0.7), 0.1, 1000);
+    camera.position.set(0, 1.4, 2.5);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight * 0.7);
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    container.appendChild(renderer.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.target.set(0, 1.2, 0);
+    controls.update();
+
+    const hemi = new THREE.HemisphereLight(0xffffff, 0x444444, 1.0);
+    hemi.position.set(0, 2, 0);
+    scene.add(hemi);
+    const dir = new THREE.DirectionalLight(0xffffff, 0.8);
+    dir.position.set(5, 10, 7.5);
+    scene.add(dir);
+
+    const loader = new GLTFLoader();
+    let current = null;
+    let originalMaterials = new Map();
+
+    function clearScene() {
+      if (current) {
+        scene.remove(current.scene || current);
+        current = null;
+        originalMaterials.clear();
+      }
+    }
+
+    function saveOriginalMaterials(gltf) {
+      gltf.scene.traverse(node => {
+        if (node.isMesh) {
+          originalMaterials.set(node.uuid, node.material.clone());
+        }
+      });
+    }
+
+    function restoreOriginalMaterials() {
+      if (!current) return;
+      current.scene.traverse(node => {
+        if (node.isMesh) {
+          const m = originalMaterials.get(node.uuid);
+          if (m) node.material = m.clone();
+        }
+      });
+    }
+
+    function applyTintToMaterial(mat, hex) {
+      if (!mat) return;
+      // Si no hay map, cambiar color base
+      if (!mat.map) {
+        if (mat.color) mat.color.set(hex);
+        mat.needsUpdate = true;
+        return Promise.resolve();
+      }
+
+      // Si tiene map, crear canvas tinted
+      return new Promise(resolve => {
+        const img = mat.map.image;
+        // Si la textura no es una imagen (ImageBitmap), intentar dibujar igual
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width || 1024;
+        canvas.height = img.height || 1024;
+        const ctx = canvas.getContext('2d');
+        if (img instanceof ImageBitmap || img instanceof HTMLImageElement) {
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        } else {
+          // fallback: rellenar con color
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+        ctx.globalCompositeOperation = 'source-atop';
+        ctx.fillStyle = hex;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        const tex = new THREE.CanvasTexture(canvas);
+        tex.encoding = THREE.sRGBEncoding;
+        tex.flipY = false;
+        mat.map = tex;
+        mat.needsUpdate = true;
+        resolve();
+      });
+    }
+
+    async function applyColor(hex) {
+      if (!current) return;
+      const promises = [];
+      current.scene.traverse(node => {
+        if (node.isMesh) {
+          promises.push(applyTintToMaterial(node.material, hex));
+        }
+      });
+      await Promise.all(promises);
+    }
+
+    document.getElementById('file').addEventListener('change', e => {
+      const f = e.target.files[0];
+      if (!f) return;
+      clearScene();
+      const url = URL.createObjectURL(f);
+      loader.load(url, gltf => {
+        current = gltf;
+        saveOriginalMaterials(gltf);
+        scene.add(gltf.scene);
+        URL.revokeObjectURL(url);
+      });
+    });
+
+    document.getElementById('apply').addEventListener('click', async () => {
+      const hex = document.getElementById('color').value;
+      await applyColor(hex);
+    });
+
+    document.getElementById('reset').addEventListener('click', () => {
+      restoreOriginalMaterials();
+    });
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / (window.innerHeight * 0.7);
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight * 0.7);
+    });
+
+    function animate() {
+      requestAnimationFrame(animate);
+      renderer.render(scene, camera);
+    }
+    animate();
+
+  </script>
+</body>
+</html>
