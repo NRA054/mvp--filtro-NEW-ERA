@@ -15,10 +15,10 @@ Crear un asistente de selección de gorras New Era que combina la forma de rostr
 
 ## Requisitos clave
 
-- Análisis de rostro ligero y fácil de usar.
-- Interfaz simple y clara para el quiz.
+- Análisis fisionómico ligero (detección facial en el cliente) y fácil de usar.
+- Interfaz simple y clara para el mini-quiz.
 - Recomendaciones enfocadas en siluetas de gorras New Era.
-- Prueba virtual que muestre al usuario el modelo sobre su rostro.
+- Probador virtual (AR) que muestre al usuario el modelo sobre su rostro.
 
 ## Criterios de éxito
 

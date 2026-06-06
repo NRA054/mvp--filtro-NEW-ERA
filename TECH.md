@@ -1,4 +1,4 @@
-# Technical Documentation
+# Documentación técnica
 
 ## 1. Visión general
 
@@ -12,7 +12,7 @@
 - Tailwind CSS o Material UI para estilos rápidos y coherentes.
 - React Router / Vue Router para manejar el flujo de preguntas, recomendaciones y AR.
 
-### Visión Artificial y ML
+### Visión artificial y ML
 - TensorFlow.js o `face-api.js` para detección facial y clasificación de tipo de rostro en el navegador.
 - MediaPipe Face Mesh como opción ligera para obtener puntos faciales sin dependencias pesadas.
 - Algoritmos heurísticos simples para mapear tipos de rostro a siluetas de gorra.
@@ -54,7 +54,7 @@
 - Cliente de visión: análisis facial que se ejecuta preferentemente en el navegador.
 
 ### 4.2 Flujo de datos
-1. El usuario responde el quiz de estilo.
+1. El usuario responde el mini-quiz de estilo.
 2. El sistema solicita cámara o permite seleccionar tipo de rostro manualmente.
 3. Se detecta la forma de cara y se asignan recomendaciones de silueta.
 4. Se muestran hasta 3 gorras sugeridas.
@@ -63,14 +63,14 @@
 ### 4.3 Integración AR
 - Diseñar AR como una capa opcional dentro del frontend.
 - En el MVP, utilizar una solución 2D/3D simple que no dependa de servicios externos.
-- Mantener la prueba virtual independiente del flujo principal para iterar rápido.
+- Mantener el probador virtual (AR) independiente del flujo principal para iterar rápido.
 
 ## 5. Decisiones técnicas
 
 ### 5.1 Enfoque frontend
 - Priorizar una experiencia autocontenida en el navegador.
 - Reducir dependencias de backend a lo mínimo, concentrándose en las funciones visibles.
-- Utilizar detección facial en cliente para mejorar la rapidez y privacidad.
+- Utilizar detección facial en el cliente (análisis fisionómico ligero) para mejorar la rapidez y privacidad.
 
 ### 5.2 Modularidad
 - Separar el quiz, la recomendación y el probador virtual en componentes independientes.

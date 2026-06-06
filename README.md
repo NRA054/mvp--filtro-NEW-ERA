@@ -10,10 +10,10 @@
 
 ## Solución propuesta
 
-- Análisis fisionómico ligero para clasificar el tipo de rostro: ovalado, redondo, cuadrado o corazón.
-- Quiz de preferencias rápido para entender el uso y estilo: deportivo, urbano, minimalista, colores y ocasión.
+- Análisis fisionómico ligero (detección facial en el cliente) para clasificar el tipo de rostro: ovalado, redondo, cuadrado o corazón.
+- Mini-quiz de preferencias rápido para entender el uso y estilo: deportivo, urbano, minimalista, colores y ocasión.
 - Recomendaciones personalizadas que cruzan forma de cara y estilo para proponer siluetas de gorras.
-- Prueba virtual AR simple para visualizar modelos sobre la cara.
+- Probador virtual (AR) simple para visualizar modelos sobre la cara.
 
 ## Valor del producto
 
