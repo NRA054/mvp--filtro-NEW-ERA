@@ -74,18 +74,24 @@ export default function ColorFilterViewer({ defaultModel }: Props) {
     if (!scene || !camera || !controls) return
 
     const box = new THREE.Box3().setFromObject(gltf.scene)
-    const size = box.getSize(new THREE.Vector3())
     const center = box.getCenter(new THREE.Vector3())
+    const sphere = box.getBoundingSphere(new THREE.Sphere())
 
     gltf.scene.position.sub(center)
 
-    const maxDim = Math.max(size.x, size.y, size.z)
-    const fov = camera.fov * (Math.PI / 180)
-    const cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2)) * 2.2
+    const maxDim = Math.max(box.getSize(new THREE.Vector3()).x, box.getSize(new THREE.Vector3()).y, box.getSize(new THREE.Vector3()).z)
+    const targetSize = 2.0
+    const scale = maxDim > 0 ? Math.min(Math.max(targetSize / maxDim, 0.6), 1.2) : 1
+    gltf.scene.scale.setScalar(scale)
 
-    camera.position.set(cameraZ, cameraZ * 0.75, cameraZ)
-    camera.near = Math.max(0.1, cameraZ / 100)
-    camera.far = cameraZ * 10
+    const radius = Math.max(sphere.radius * scale, 0.5)
+    const fov = camera.fov * (Math.PI / 180)
+    const distance = radius / Math.sin(fov / 2) * 3.5
+
+    camera.position.set(0, radius * 1.0, distance)
+    camera.near = Math.max(0.1, distance / 100)
+    camera.far = distance * 12
+    camera.lookAt(0, 0, 0)
     camera.updateProjectionMatrix()
 
     controls.target.set(0, 0, 0)
@@ -101,7 +107,7 @@ export default function ColorFilterViewer({ defaultModel }: Props) {
     sceneRef.current = scene
 
     const camera = new THREE.PerspectiveCamera(45, el.clientWidth / el.clientHeight, 0.1, 1000)
-    camera.position.set(0, 1.4, 2.5)
+    camera.position.set(0, 0.8, 2.5)
     cameraRef.current = camera
 
     const renderer = new THREE.WebGLRenderer({ antialias: true })
@@ -129,11 +135,12 @@ export default function ColorFilterViewer({ defaultModel }: Props) {
     const controls = new OrbitControls(camera, renderer.domElement)
     controls.enableDamping = true
     controls.dampingFactor = 0.05
-    controls.autoRotate = true
-    controls.autoRotateSpeed = 1.0
+    controls.autoRotate = false
     controls.enablePan = false
     controls.minDistance = 0.5
     controls.maxDistance = 10
+    controls.minPolarAngle = Math.PI / 4
+    controls.maxPolarAngle = Math.PI / 2
     controlsRef.current = controls
 
     const animate = () => {
