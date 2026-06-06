@@ -2,121 +2,100 @@
 
 ## 1. Visión general
 
-`mvp--filtro-NEW-ERA` es una propuesta de filtro inteligente para la marca New Era, pensado para guiar la elección de gorras según el rostro y los gustos del usuario. Busca reducir la fricción de compra online con recomendaciones personalizadas, análisis fisionómico y experiencia de visualización previa.
+`mvp--filtro-NEW-ERA` es un MVP enfocado en la experiencia de selección de gorras New Era, basado en la forma del rostro y las preferencias de estilo del usuario. El objetivo es entregar recomendaciones útiles y una vista previa visual sin sobrecargar el proyecto con infraestructuras complejas.
 
 ## 2. Stack recomendado
 
 ### Frontend
-- React (SPA) o Vue.js para UI dinámica y componentes reutilizables.
-- Typescript para mayor seguridad en el código y escalabilidad.
-- Tailwind CSS o Material UI para estilos rápidos y consistentes.
-- React Router / Vue Router para navegación de flujo de preguntas, recomendaciones y prueba AR.
-
-### Backend
-- Node.js con Express o Fastify para API REST.
-- Typescript en backend para mantener consistencia con el frontend.
-- Base de datos: PostgreSQL para datos de catálogo, usuarios y preferencias.
-- Redis opcional para caching de recomendaciones y sesiones.
+- React (SPA) o Vue.js para construir la experiencia interactiva.
+- TypeScript para mayor seguridad y claridad en el desarrollo.
+- Tailwind CSS o Material UI para estilos rápidos y coherentes.
+- React Router / Vue Router para manejar el flujo de preguntas, recomendaciones y AR.
 
 ### Visión Artificial y ML
-- OpenCV / TensorFlow.js para detección de rasgos faciales y clasificación de tipo de rostro.
-- MediaPipe Face Mesh como opción ligera para obtener puntos faciales sin depender de servicios externos.
-- Modelos entrenados o heurísticos para mapear tipos de rostro a siluetas de gorra.
+- TensorFlow.js o `face-api.js` para detección facial y clasificación de tipo de rostro en el navegador.
+- MediaPipe Face Mesh como opción ligera para obtener puntos faciales sin dependencias pesadas.
+- Algoritmos heurísticos simples para mapear tipos de rostro a siluetas de gorra.
 
 ### Realidad Aumentada (AR)
-- WebXR o librerías de AR basadas en WebGL para superponer gorras en la cámara.
-- Alternativa móvil: AR.js o Three.js para prueba virtual si el MVP funciona en navegador.
+- AR.js, Three.js o WebXR para superponer una gorra sobre la cámara.
+- Implementación de prueba virtual que pueda funcionar directamente en el navegador.
 
-### DevOps / Infraestructura
-- GitHub Actions para CI/CD de compilación y despliegue.
-- Docker para contenerización de servicios.
-- Despliegue en Vercel/Netlify para frontend y en un servicio de nube (AWS / DigitalOcean / Railway) para backend.
+### Operaciones y despliegue
+- GitHub Actions para CI de frontend.
+- Despliegue en Vercel o Netlify para una entrega rápida del MVP.
+- Docker opcional para entornos locales consistentes.
 
 ## 3. Librerías clave
 
 ### Frontend
 - `react` / `vue`
 - `typescript`
-- `axios` o `fetch` para llamadas a API
-- `react-hook-form` / `vee-validate` para formularios de quiz
-- `zustand` / `redux-toolkit` para estado compartido (recomendado si hay flujo complejo)
-- `three` y `@react-three/fiber` si se implementa visualización 3D ligera
-
-### Backend
-- `express` o `fastify`
-- `prisma` o `typeorm` para ORM con PostgreSQL
-- `zod` para validación de datos
-- `jsonwebtoken` si se añade autenticación
-- `multer` si el servicio recibe imágenes de usuario
+- `axios` o `fetch` para carga de datos del catálogo o simulaciones de recomendación.
+- `react-hook-form` / `vee-validate` para el quiz de usuario.
+- `zustand` / `pinia` para estado compartido si el producto requiere múltiples pantallas.
+- `three` y `@react-three/fiber` si se usa visualización 3D ligera.
 
 ### ML / Visión
-- `opencv4nodejs` o `@tensorflow/tfjs`
+- `@tensorflow/tfjs`
 - `@mediapipe/face_mesh`
-- `face-api.js` como alternativa de detección facial en cliente
+- `face-api.js`
 
 ### AR / Cámara
 - `@react-three/fiber`
 - `three`
-- `webxr-polyfill` si se busca compatibilidad multiplataforma
+- `ar.js` o `webxr-polyfill` según compatibilidad.
 
 ## 4. Arquitectura propuesta
 
 ### 4.1 Capas del sistema
-- Capa de interfaz: aplicación web responsiva que guía al usuario con quiz, resultados y vista previa.
-- Capa de aplicación: lógica de recomendación, reglas de curaduría y mapeo entre tipo de rostro y gorras.
-- Capa de datos: catálogo de productos, perfiles de estilo y reglas de recomendación.
-- Capa de ML/visión: procesamiento de la imagen para detectar tipo de rostro y extraer métricas.
+- Interfaz: experiencia web responsiva que guía al usuario paso a paso.
+- Lógica de recomendación: reglas de estilo y mapeo entre tipo de rostro y silueta.
+- Cliente de visión: análisis facial que se ejecuta preferentemente en el navegador.
 
 ### 4.2 Flujo de datos
-1. El usuario entra y responde preguntas sobre estilo y uso.
-2. El sistema solicita o captura una imagen de rostro.
-3. El motor de visión artificial detecta forma de cara y sugiere siluetas apropiadas.
-4. El motor de curaduría combina el resultado del quiz con el análisis fisionómico.
-5. El usuario recibe un listado filtrado de gorras y puede probar modelos en AR.
+1. El usuario responde el quiz de estilo.
+2. El sistema solicita cámara o permite seleccionar tipo de rostro manualmente.
+3. Se detecta la forma de cara y se asignan recomendaciones de silueta.
+4. Se muestran hasta 3 gorras sugeridas.
+5. El usuario puede activar el probador virtual AR para ver la gorra en su rostro.
 
-### 4.3 Integración de AR
-- Usar la cámara del dispositivo para superponer una gorra sobre la cara.
-- El primer MVP puede ofrecer una previsualización basada en un modelo 2D/3D simple.
-- Mantener la AR como un componente independiente para facilitar iteraciones.
+### 4.3 Integración AR
+- Diseñar AR como una capa opcional dentro del frontend.
+- En el MVP, utilizar una solución 2D/3D simple que no dependa de servicios externos.
+- Mantener la prueba virtual independiente del flujo principal para iterar rápido.
 
 ## 5. Decisiones técnicas
 
-### 5.1 Elección de stack
-- Elegir `React + TypeScript` permite acelerar el desarrollo con un ecosistema sólido y mayor mantenibilidad.
-- Elegir `Node.js + Express/Fastify` facilita el desarrollo de APIs y la integración con servicios de visión artificial.
+### 5.1 Enfoque frontend
+- Priorizar una experiencia autocontenida en el navegador.
+- Reducir dependencias de backend a lo mínimo, concentrándose en las funciones visibles.
+- Utilizar detección facial en cliente para mejorar la rapidez y privacidad.
 
 ### 5.2 Modularidad
-- Separar claramente el módulo de recomendación del módulo de AR y del módulo de gestión de catálogo.
-- El backend debe exponer endpoints claros: `/quiz`, `/recommendations`, `/face-analysis`, `/catalog`.
+- Separar el quiz, la recomendación y el probador virtual en componentes independientes.
+- Mantener el motor de mapeo de rostro y estilo como una capa reutilizable.
 
-### 5.3 Rendimiento y escalabilidad
-- Mantener el análisis de rostro del lado del cliente cuando sea posible para reducir latencia y privacidad.
-- Usar cache para recomendaciones frecuentes y filtros de usuario.
-- Diseñar la arquitectura para que el motor de visión sea escalable como servicio independiente.
-
-### 5.4 Privacidad y datos
-- No almacenar imágenes de rostro a menos que sean necesarias.
-- Si se recoge información personal, cumplir con políticas de privacidad y normativas locales.
-
-### 5.5 MVP prioritario
-- Priorizar el flujo de descubrimiento: quiz + recomendaciones basadas en el tipo de rostro.
-- Dejar la prueba AR como funcionalidad de segundo paso a medida que el prototipo se estabilice.
+### 5.3 Privacidad y simplicidad
+- Evitar el almacenamiento de imágenes de rostro.
+- Procesar datos de cara en el dispositivo siempre que sea posible.
+- Mantener la experiencia ligera y fácil de probar.
 
 ## 6. Recomendaciones para el desarrollo
 
-- Documentar el catálogo de gorras y las reglas de mapeo entre tipo de rostro y silueta.
-- Definir claramente las categorías de estilos (`deportivo`, `urbano`, `minimalista`, etc.).
-- Probar el análisis facial con muestras reales y ajustar el mapeo de recomendaciones.
-- Mantener el proyecto lo más ligero posible en la primera versión para validar el concepto.
+- Definir claramente las categorías de estilo (`deportivo`, `urbano`, `minimalista`, etc.).
+- Crear la guía de mapeo entre tipos de rostro y siluetas de gorras.
+- Validar la detección facial con ejemplos reales.
+- Construir el MVP como una experiencia frontend ágil antes de añadir más capas.
 
 ## 7. Estructura de carpetas sugerida
 
-- `/src/frontend` - aplicación web
-- `/src/backend` - servidor API
-- `/src/ml` - lógica de análisis fisionómico
-- `/src/data` - modelos de datos y reglas de recomendación
-- `/docs` - documentación adicional
+- `/src` - aplicación web
+- `/src/components` - componentes UI y de flujo
+- `/src/lib` - lógica de recomendación y reglas de estilo
+- `/src/vision` - integración de detección facial y AR
+- `/public` - activos visuales y datos de catálogo
 
 ---
 
-Este `TECH.md` está diseñado para servir como guía técnica del proyecto, mostrando el stack, las librerías principales, la arquitectura propuesta y las decisiones que respaldan el MVP de filtro de gorras New Era.
+Este `TECH.md` se enfoca en la experiencia frontend del MVP, eliminando la propuesta de backend y priorizando las herramientas de visión artificial y AR para la selección de gorras.
